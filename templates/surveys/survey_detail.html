@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Survey Details | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/surveys/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Surveys</a>
+            <h1 class="h2 text-white fw-bold mb-0">House Details - {{ survey.house_number }}</h1>
+            <p class="text-secondary mb-0">Panchayat: {{ survey.panchayat }} | Ward: {{ survey.ward }}</p>
+        </div>
+        <div>
+            <span class="text-secondary">Submitted by:</span> <span class="badge bg-primary">{{ survey.submitted_by.username }} ({{ survey.submitted_role }})</span>
+            <div class="text-secondary text-end mt-1"><small>Date: {{ survey.submitted_at|date:"Y-m-d H:i" }}</small></div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Household details -->
+        <div class="col-xl-4">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4">Household Information</h4>
+                <div class="mb-3">
+                    <span class="text-secondary d-block">Family Head</span>
+                    <strong class="text-white fs-5">{{ survey.family_head_name }}</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary d-block">Total Family Members</span>
+                    <strong class="text-white fs-5">{{ survey.family_members_count }}</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary d-block">Address</span>
+                    <span class="text-white">{{ survey.address }}</span>
+                </div>
+                <hr class="border-secondary my-4">
+                <div class="mb-3">
+                    <span class="text-secondary d-block">Center Location</span>
+                    <span class="text-white fw-semibold">{{ survey.center.name }}</span>
+                </div>
+                <div class="mb-0">
+                    <span class="text-secondary d-block">Subcenter Jurisdiction</span>
+                    <span class="text-white fw-semibold">{{ survey.subcenter.name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members list -->
+        <div class="col-xl-8">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4">Family Members & Health Profiles</h4>
+                
+                {% if members %}
+                    {% for member in members %}
+                        <div class="p-3 border rounded-3 mb-3" style="background: rgba(15, 23, 42, 0.4); border-color: var(--card-border) !important;">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <h5 class="text-white mb-1">{{ member.name }}</h5>
+                                    <span class="text-secondary"><small>{{ member.age }} years | {{ member.get_gender_display }}</small></span>
+                                    {% if member.occupation %}
+                                        <div class="text-secondary mt-1"><small><i class="fa-solid fa-briefcase me-1"></i>{{ member.occupation }}</small></div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <small class="text-secondary d-block">Vaccination</small>
+                                            <span class="badge {% if member.vaccination_status == 'FULLY' %}bg-success{% elif member.vaccination_status == 'PARTIALLY' %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill">
+                                                {{ member.get_vaccination_status_display }}
+                                            </span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-secondary d-block">Blood Pressure</small>
+                                            <span class="text-white fw-semibold">
+                                                {% if member.blood_pressure_systolic %}
+                                                    {{ member.blood_pressure_systolic }}/{{ member.blood_pressure_diastolic }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-secondary d-block">Pregnancy Status</small>
+                                            <span class="badge {% if member.is_pregnant %}bg-purple{% else %}bg-secondary{% endif %}">
+                                                {% if member.is_pregnant %}Pregnant{% else %}No{% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                {% if member.has_diabetes %}
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20">Diabetes</span>
+                                                {% endif %}
+                                                {% if member.has_cancer %}
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20">Cancer</span>
+                                                {% endif %}
+                                                
+                                                {% if member.diseases %}
+                                                    <span class="text-secondary me-1"><small>Other Diseases:</small></span>
+                                                    <span class="text-white"><small>{{ member.diseases }}</small></span>
+                                                {% endif %}
+                                            </div>
+                                            {% if member.disabilities %}
+                                                <div class="mt-2 text-secondary"><small><strong>Disabilities:</strong> {{ member.disabilities }}</small></div>
+                                            {% endif %}
+                                            {% if member.mental_health_indicators %}
+                                                <div class="mt-1 text-secondary"><small><strong>Mental Health:</strong> {{ member.mental_health_indicators }}</small></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4 text-secondary">
+                        <p class="mb-0">No family members registered under this house record.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-surveys').classList.add('active');
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+/* Custom CSS tweaks for Health Department Survey Management System */
+.glass-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}

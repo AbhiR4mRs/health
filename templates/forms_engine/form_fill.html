@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Fill Form: {{ form_def.name }} | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/forms/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Forms</a>
+            <h1 class="h2 text-white fw-bold mb-0">{{ form_def.name }}</h1>
+            <p class="text-secondary mb-0">{{ form_def.description|default:"Please fill out all fields in this custom health survey." }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-lg-8">
+            <div class="glass-card mb-5">
+                <form method="post" action="/forms/fill/{{ form_def.identifier }}/" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold">
+                                {{ field.label }} 
+                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            
+                            {{ field }}
+                            
+                            {% if field.help_text %}
+                                <div class="form-text text-secondary"><small>{{ field.help_text }}</small></div>
+                            {% endif %}
+                            
+                            {% if field.errors %}
+                                <div class="text-danger mt-1"><small>{{ field.errors|striptags }}</small></div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <a href="/forms/" class="btn btn-outline-light rounded-3">Cancel</a>
+                        <button type="submit" class="btn btn-gradient">
+                            <i class="fa-solid fa-check-double me-1"></i>Submit Response
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-forms').classList.add('active');
+</script>
+{% endblock %}

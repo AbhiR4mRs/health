@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Health Survey Management System{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Enterprise Health Department Survey and Outbreak Surveillance System{% endblock %}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Glassmorphism Styles -->
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: rgba(17, 24, 39, 0.95);
+            --card-bg: rgba(30, 41, 59, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary-accent: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--card-border);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            z-index: 100;
+            padding-top: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .brand {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar .brand i {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar .brand span {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+            color: #fff;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.25rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            color: #fff;
+            background-color: rgba(59, 130, 246, 0.15);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link-custom i {
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-link-custom:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Top Header */
+        .top-header {
+            height: 70px;
+            background-color: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 260px;
+            z-index: 99;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Main Content wrapper */
+        .main-wrapper {
+            margin-left: 260px;
+            padding: 95px 2rem 2rem 2rem;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            padding: 1.5rem;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Stats Cards */
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        /* Typography & Buttons */
+        h1, h2, h3, h4, h5, h6 {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            color: #fff;
+        }
+
+        .table-custom {
+            --bs-table-bg: transparent !important;
+            --bs-table-color: var(--text-primary) !important;
+            --bs-table-hover-color: #fff !important;
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.05) !important;
+            --bs-table-striped-bg: rgba(255, 255, 255, 0.02) !important;
+            --bs-table-striped-color: var(--text-primary) !important;
+            --bs-table-border-color: var(--card-border) !important;
+            color: var(--text-primary) !important;
+            vertical-align: middle;
+        }
+
+        .table-custom th {
+            color: var(--text-secondary) !important;
+            border-bottom: 2px solid var(--card-border) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-custom td {
+            border-bottom: 1px solid var(--card-border) !important;
+            padding: 1rem 0.75rem;
+            color: #e2e8f0 !important;
+        }
+
+        .badge-pill {
+            padding: 0.35em 0.8em;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>HealthSurvey</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a id="nav-dash" href="/dashboard/" class="nav-link-custom">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="nav-surveys" href="/surveys/" class="nav-link-custom">
+                    <i class="fa-solid fa-house-medical"></i>
+                    <span>Health Surveys</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="nav-forms" href="/forms/" class="nav-link-custom">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>Custom Forms</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="nav-reports" href="/reports/" class="nav-link-custom">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Reports & Exports</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a id="nav-ml" href="/ml/" class="nav-link-custom">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>ML Insights</span>
+                </a>
+            </li>
+            {% if request.user.role == 'HQ' %}
+            <li class="nav-item">
+                <a id="nav-mgmt" href="/management/" class="nav-link-custom">
+                    <i class="fa-solid fa-sitemap"></i>
+                    <span>HQ Management</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </aside>
+
+    <!-- Top Header -->
+    <header class="top-header">
+        <div>
+            <span class="text-secondary">Role: </span>
+            <span class="badge bg-primary text-white">
+                {% if request.user.role == 'CONDUCTOR' %}
+                    Conductor ({{ request.user.conductor_role }})
+                {% else %}
+                    {{ request.user.role }} Admin
+                {% endif %}
+            </span>
+            {% if request.user.center %}
+                <span class="text-secondary ms-2">Center: </span><span class="text-white">{{ request.user.center.name }}</span>
+            {% endif %}
+            {% if request.user.subcenter %}
+                <span class="text-secondary ms-2">Subcenter: </span><span class="text-white">{{ request.user.subcenter.name }}</span>
+            {% endif %}
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-white font-weight-500">{{ request.user.username }}</span>
+            <a href="/logout/" class="btn btn-outline-danger btn-sm rounded-3">
+                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap & Chart.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block title %}HQ Management | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white fw-bold mb-0">HQ System Management</h1>
+            <p class="text-secondary mb-0">Configure system hierarchy nodes and user registrations</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 rounded-3 mb-4 bg-opacity-25" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <!-- Forms panel -->
+        <div class="col-xl-4">
+            <div class="glass-card mb-4">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Add New Center</h4>
+                <form method="post" action="/management/">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_center">
+                    <div class="mb-3">
+                        <label for="c_name" class="form-label text-secondary"><small>Center Name</small></label>
+                        <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="c_name" name="name" required placeholder="e.g. Medical Center A">
+                    </div>
+                    <div class="mb-3">
+                        <label for="c_code" class="form-label text-secondary"><small>Unique Center Code</small></label>
+                        <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="c_code" name="code" required placeholder="e.g. CHC-A">
+                    </div>
+                    <div class="mb-3">
+                        <label for="c_addr" class="form-label text-secondary"><small>Address</small></label>
+                        <textarea class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="c_addr" name="address" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-gradient w-100">Create Center</button>
+                </form>
+            </div>
+
+            <div class="glass-card">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Add New Subcenter</h4>
+                <form method="post" action="/management/">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_subcenter">
+                    <div class="mb-3">
+                        <label for="sc_center" class="form-label text-secondary"><small>Parent Center</small></label>
+                        <select class="form-select bg-dark bg-opacity-50 text-white border-secondary" id="sc_center" name="center_id" required>
+                            <option value="">Select Parent Center</option>
+                            {% for c in centers %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sc_name" class="form-label text-secondary"><small>Subcenter Name</small></label>
+                        <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="sc_name" name="name" required placeholder="e.g. Subcenter 1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sc_code" class="form-label text-secondary"><small>Unique Subcenter Code</small></label>
+                        <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="sc_code" name="code" required placeholder="e.g. SC-1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="sc_addr" class="form-label text-secondary"><small>Address</small></label>
+                        <textarea class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="sc_addr" name="address" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-gradient w-100">Create Subcenter</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Listing tables panel -->
+        <div class="col-xl-8">
+            <div class="glass-card">
+                <ul class="nav nav-tabs border-secondary border-opacity-25 mb-4" id="hqTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active bg-transparent text-white border-0 border-bottom border-primary border-3" id="centers-tab" data-bs-toggle="tab" data-bs-target="#centers-panel" type="button" role="tab">Centers</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-transparent text-secondary border-0" id="subcenters-tab" data-bs-toggle="tab" data-bs-target="#subcenters-panel" type="button" role="tab">Subcenters</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-transparent text-secondary border-0" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-panel" type="button" role="tab">Users Registry</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="hqTabsContent">
+                    <!-- Centers panel -->
+                    <div class="tab-pane fade show active" id="centers-panel" role="tabpanel">
+                        {% if centers %}
+                            <div class="table-responsive">
+                                <table class="table table-custom mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Center Name</th>
+                                            <th>Code</th>
+                                            <th>Subcenters Count</th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in centers %}
+                                            <tr>
+                                                <td><span class="fw-semibold text-white">{{ c.name }}</span></td>
+                                                <td><span class="badge bg-secondary">{{ c.code }}</span></td>
+                                                <td>{{ c.subcenters.count }}</td>
+                                                <td><small>{{ c.address|default:"N/A" }}</small></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-secondary py-3 text-center">No centers registered yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Subcenters panel -->
+                    <div class="tab-pane fade" id="subcenters-panel" role="tabpanel">
+                        {% if subcenters %}
+                            <div class="table-responsive">
+                                <table class="table table-custom mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Subcenter Name</th>
+                                            <th>Code</th>
+                                            <th>Parent Center</th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for sc in subcenters %}
+                                            <tr>
+                                                <td><span class="fw-semibold text-white">{{ sc.name }}</span></td>
+                                                <td><span class="badge bg-secondary">{{ sc.code }}</span></td>
+                                                <td>{{ sc.center.name }}</td>
+                                                <td><small>{{ sc.address|default:"N/A" }}</small></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-secondary py-3 text-center">No subcenters registered yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Users panel -->
+                    <div class="tab-pane fade" id="users-panel" role="tabpanel">
+                        {% if users %}
+                            <div class="table-responsive">
+                                <table class="table table-custom mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>System Role</th>
+                                            <th>Center Association</th>
+                                            <th>Subcenter Association</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for u in users %}
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-semibold text-white">{{ u.username }}</span>
+                                                    {% if u.email %}<div style="font-size:0.75rem" class="text-secondary">{{ u.email }}</div>{% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if u.role == 'CONDUCTOR' %}
+                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20">{{ u.conductor_role }} Conductor</span>
+                                                    {% else %}
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20">{{ u.role }} Admin</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ u.center.name|default:"N/A" }}</td>
+                                                <td>{{ u.subcenter.name|default:"N/A" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-secondary py-3 text-center">No users found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-mgmt').classList.add('active');
+
+    // Simple script to toggle active tab headers styling nicely
+    const tabElList = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabElList.forEach(tabEl => {
+        tabEl.addEventListener('show.bs.tab', event => {
+            // Remove active classes from old tab
+            event.relatedTarget.classList.remove('text-white', 'border-bottom', 'border-primary', 'border-3');
+            event.relatedTarget.classList.add('text-secondary');
+            
+            // Add active classes to new tab
+            event.target.classList.remove('text-secondary');
+            event.target.classList.add('text-white', 'border-bottom', 'border-primary', 'border-3');
+        });
+    });
+</script>
+{% endblock %}

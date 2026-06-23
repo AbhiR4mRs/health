@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Reports and Exports | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white fw-bold mb-0">Reports & Exports</h1>
+            <p class="text-secondary mb-0">Generate, filter, and export health surveys and disease distributions</p>
+        </div>
+    </div>
+
+    <!-- Filter card -->
+    <div class="glass-card mb-4">
+        <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-filter me-2 text-primary"></i>Filter Report Data</h4>
+        <form method="get" action="/reports/" id="filter-form">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="date_start" class="form-label text-secondary"><small>Start Date</small></label>
+                    <input type="date" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="date_start" name="date_start" value="{{ filters.date_start|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_end" class="form-label text-secondary"><small>End Date</small></label>
+                    <input type="date" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="date_end" name="date_end" value="{{ filters.date_end|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="disease" class="form-label text-secondary"><small>Disease Name</small></label>
+                    <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="disease" name="disease" placeholder="e.g. Fever, Diabetes" value="{{ filters.disease|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="conductor_id" class="form-label text-secondary"><small>Survey Conductor</small></label>
+                    <select class="form-select bg-dark bg-opacity-50 text-white border-secondary" id="conductor_id" name="conductor_id">
+                        <option value="">All Conductors</option>
+                        {% for cond in conductors %}
+                            <option value="{{ cond.id }}" {% if filters.conductor_id|slugify == cond.id|slugify %}selected{% endif %}>{{ cond.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                {% if request.user.role == 'HQ' or request.user.is_superuser %}
+                <div class="col-md-6">
+                    <label for="center_id" class="form-label text-secondary"><small>Center Jurisdiction</small></label>
+                    <select class="form-select bg-dark bg-opacity-50 text-white border-secondary" id="center_id" name="center_id">
+                        <option value="">All Centers</option>
+                        {% for center in centers %}
+                            <option value="{{ center.id }}" {% if filters.center_id|slugify == center.id|slugify %}selected{% endif %}>{{ center.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                {% if request.user.role == 'HQ' or request.user.role == 'CENTER' or request.user.is_superuser %}
+                <div class="col-md-6">
+                    <label for="subcenter_id" class="form-label text-secondary"><small>Subcenter Jurisdiction</small></label>
+                    <select class="form-select bg-dark bg-opacity-50 text-white border-secondary" id="subcenter_id" name="subcenter_id">
+                        <option value="">All Subcenters</option>
+                        {% for sc in subcenters %}
+                            <option value="{{ sc.id }}" {% if filters.subcenter_id|slugify == sc.id|slugify %}selected{% endif %}>{{ sc.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div>
+                    <span class="text-secondary fw-semibold">Filtered records count: </span>
+                    <span class="badge bg-primary fs-6">{{ total_count }}</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/reports/" class="btn btn-outline-light rounded-3">Clear Filters</a>
+                    <button type="submit" class="btn btn-primary rounded-3">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Export section -->
+    <div class="glass-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title h5 text-white mb-0"><i class="fa-solid fa-file-export me-2 text-primary"></i>Export Options</h4>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-success" onclick="triggerExport('excel')">
+                    <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-info" onclick="triggerExport('csv')">
+                    <i class="fa-solid fa-file-csv me-1"></i>Export CSV
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="triggerExport('pdf')">
+                    <i class="fa-solid fa-file-pdf me-1"></i>Export PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview table -->
+        <h5 class="text-secondary mb-3"><small>Data Preview (First 50 records)</small></h5>
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Age/Gender</th>
+                            <th>Vaccination</th>
+                            <th>BP Status</th>
+                            <th>Diabetes</th>
+                            <th>Cancer</th>
+                            <th>Other Diseases</th>
+                            <th>House & Conductor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                            <tr>
+                                <td><span class="fw-semibold text-white">{{ r.name }}</span></td>
+                                <td>{{ r.age }}y / {{ r.get_gender_display }}</td>
+                                <td>
+                                    <span class="badge {% if r.vaccination_status == 'FULLY' %}bg-success{% elif r.vaccination_status == 'PARTIALLY' %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill">
+                                        {{ r.get_vaccination_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if r.blood_pressure_systolic %}
+                                        {{ r.blood_pressure_systolic }}/{{ r.blood_pressure_diastolic }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{% if r.has_diabetes %}Yes{% else %}No{% endif %}</td>
+                                <td>{% if r.has_cancer %}Yes{% else %}No{% endif %}</td>
+                                <td><small>{{ r.diseases|default:"None" }}</small></td>
+                                <td>
+                                    <div>House {{ r.survey.house_number }}</div>
+                                    <small class="text-secondary">Conductor: {{ r.survey.submitted_by.username }}</small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-secondary">
+                <i class="fa-solid fa-folder-open mb-3" style="font-size: 2.5rem;"></i>
+                <p class="mb-0">No records found matching the active search filters.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-reports').classList.add('active');
+
+    function triggerExport(format) {
+        const form = document.getElementById('filter-form');
+        const urlParams = new URLSearchParams(new FormData(form));
+        urlParams.append('export', format);
+        window.location.href = `/reports/?` + urlParams.toString();
+    }
+</script>
+{% endblock %}

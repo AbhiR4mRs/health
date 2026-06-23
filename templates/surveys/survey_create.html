@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block title %}New Health Survey | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/surveys/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Surveys</a>
+            <h1 class="h2 text-white fw-bold mb-0">New Health Survey</h1>
+            <p class="text-secondary mb-0">Submit a new primary household survey entry</p>
+        </div>
+    </div>
+
+    <form method="post" action="/surveys/create/" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="row g-4 mb-4">
+            <!-- House Details -->
+            <div class="col-xl-6">
+                <div class="glass-card h-100">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-house-user me-2 text-primary"></i>House & Location Details</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="house_number" class="form-label text-secondary fw-semibold">House Number</label>
+                            <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="house_number" name="house_number" required placeholder="e.g. 12/45B">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="panchayat" class="form-label text-secondary fw-semibold">Panchayat</label>
+                            <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="panchayat" name="panchayat" required placeholder="e.g. Vellanad">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ward" class="form-label text-secondary fw-semibold">Ward Name/Number</label>
+                            <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="ward" name="ward" required placeholder="e.g. Ward 4">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="family_members_count" class="form-label text-secondary fw-semibold">Total Family Members Count</label>
+                            <input type="number" class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="family_members_count" name="family_members_count" required min="1" value="1">
+                        </div>
+                        <div class="col-12">
+                            <label for="address" class="form-label text-secondary fw-semibold">Full Address</label>
+                            <textarea class="form-control bg-dark bg-opacity-50 text-white border-secondary" id="address" name="address" required rows="3" placeholder="Enter house address details"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Head details -->
+            <div class="col-xl-6">
+                <div class="glass-card h-100">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-user-tie me-2 text-primary"></i>Family Head Information</h4>
+                    <div class="mb-4">
+                        <label for="family_head_name" class="form-label text-secondary fw-semibold">Family Head Full Name</label>
+                        <input type="text" class="form-control bg-dark bg-opacity-50 text-white border-secondary form-control-lg" id="family_head_name" name="family_head_name" required placeholder="Enter full name of family head">
+                    </div>
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 text-white p-3 mb-0" role="alert">
+                        <i class="fa-solid fa-info-circle me-2"></i>
+                        Make sure to add the family head as the first member in the <strong>Family Members Profile</strong> section below to capture their individual health status.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family members list -->
+        <div class="glass-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="card-title h5 text-white mb-0"><i class="fa-solid fa-users me-2 text-primary"></i>Family Members Profile</h4>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-3" id="add-member-btn">
+                    <i class="fa-solid fa-user-plus me-1"></i>Add Member
+                </button>
+            </div>
+            
+            <div id="members-container">
+                <!-- Dynamically generated members go here -->
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mb-5">
+            <button type="submit" class="btn btn-lg btn-gradient">
+                <i class="fa-solid fa-cloud-arrow-up me-2"></i>Submit Survey Record
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Template for adding dynamic member rows -->
+<template id="member-template">
+    <div class="member-row p-3 border rounded-3 mb-3 position-relative" style="background: rgba(15, 23, 42, 0.4); border-color: var(--card-border) !important;">
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 remove-member-btn" aria-label="Close"></button>
+        <h5 class="text-primary mb-3">Member #<span class="member-num">1</span></h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label text-secondary"><small>Full Name</small></label>
+                <input type="text" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-name-input" required placeholder="Name">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-secondary"><small>Age</small></label>
+                <input type="number" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-age-input" required min="0" placeholder="Age">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-secondary"><small>Gender</small></label>
+                <select class="form-select form-select-sm bg-dark bg-opacity-50 text-white border-secondary member-gender-select">
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-secondary"><small>Occupation</small></label>
+                <input type="text" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-occupation-input" placeholder="e.g. Farmer, Teacher">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-secondary"><small>Vaccination Status</small></label>
+                <select class="form-select form-select-sm bg-dark bg-opacity-50 text-white border-secondary member-vaccination-select">
+                    <option value="FULLY">Fully Vaccinated</option>
+                    <option value="PARTIALLY">Partially Vaccinated</option>
+                    <option value="NOT" selected>Not Vaccinated</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label text-secondary"><small>BP (Systolic)</small></label>
+                <input type="number" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-bp-sys" placeholder="e.g. 120">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-secondary"><small>BP (Diastolic)</small></label>
+                <input type="number" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-bp-dia" placeholder="e.g. 80">
+            </div>
+            <div class="col-md-2 d-flex align-items-center mt-4">
+                <div class="form-check">
+                    <input class="form-check-input member-pregnant-check" type="checkbox" value="true">
+                    <label class="form-check-label text-white"><small>Is Pregnant</small></label>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-center mt-4">
+                <div class="form-check">
+                    <input class="form-check-input member-diabetes-check" type="checkbox" value="true">
+                    <label class="form-check-label text-white"><small>Has Diabetes</small></label>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-center mt-4">
+                <div class="form-check">
+                    <input class="form-check-input member-cancer-check" type="checkbox" value="true">
+                    <label class="form-check-label text-white"><small>Has Cancer</small></label>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label text-secondary"><small>Other Specific Diseases</small></label>
+                <input type="text" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-diseases-input" placeholder="e.g. Asthma, Thyroid (comma separated)">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-secondary"><small>Disabilities (If any)</small></label>
+                <input type="text" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-disabilities-input" placeholder="e.g. Locomotor, Visual">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-secondary"><small>Mental Health Indicators</small></label>
+                <input type="text" class="form-control form-control-sm bg-dark bg-opacity-50 text-white border-secondary member-mental-input" placeholder="e.g. Anxiety, Depression symptoms">
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-surveys').classList.add('active');
+
+    let memberCount = 0;
+    const container = document.getElementById('members-container');
+    const template = document.getElementById('member-template');
+    const addBtn = document.getElementById('add-member-btn');
+
+    function addMember() {
+        const clone = template.content.cloneNode(true);
+        const row = clone.querySelector('.member-row');
+        
+        // Set dynamic field names based on memberCount
+        row.querySelector('.member-num').textContent = memberCount + 1;
+        row.querySelector('.member-name-input').name = `member_name_${memberCount}`;
+        row.querySelector('.member-age-input').name = `member_age_${memberCount}`;
+        row.querySelector('.member-gender-select').name = `member_gender_${memberCount}`;
+        row.querySelector('.member-occupation-input').name = `member_occupation_${memberCount}`;
+        row.querySelector('.member-vaccination-select').name = `member_vaccination_${memberCount}`;
+        row.querySelector('.member-pregnant-check').name = `member_pregnant_${memberCount}`;
+        row.querySelector('.member-diabetes-check').name = `member_diabetes_${memberCount}`;
+        row.querySelector('.member-cancer-check').name = `member_cancer_${memberCount}`;
+        row.querySelector('.member-diseases-input').name = `member_diseases_${memberCount}`;
+        row.querySelector('.member-disabilities-input').name = `member_disabilities_${memberCount}`;
+        row.querySelector('.member-mental-input').name = `member_mental_${memberCount}`;
+        row.querySelector('.member-bp-sys').name = `member_bp_sys_${memberCount}`;
+        row.querySelector('.member-bp-dia').name = `member_bp_dia_${memberCount}`;
+
+        // Add close event
+        row.querySelector('.remove-member-btn').addEventListener('click', function() {
+            row.remove();
+            renumberMembers();
+        });
+
+        container.appendChild(row);
+        memberCount++;
+    }
+
+    function renumberMembers() {
+        const rows = container.querySelectorAll('.member-row');
+        memberCount = 0;
+        rows.forEach((row, index) => {
+            row.querySelector('.member-num').textContent = index + 1;
+            row.querySelector('.member-name-input').name = `member_name_${index}`;
+            row.querySelector('.member-age-input').name = `member_age_${index}`;
+            row.querySelector('.member-gender-select').name = `member_gender_${index}`;
+            row.querySelector('.member-occupation-input').name = `member_occupation_${index}`;
+            row.querySelector('.member-vaccination-select').name = `member_vaccination_${index}`;
+            row.querySelector('.member-pregnant-check').name = `member_pregnant_${index}`;
+            row.querySelector('.member-diabetes-check').name = `member_diabetes_${index}`;
+            row.querySelector('.member-cancer-check').name = `member_cancer_${index}`;
+            row.querySelector('.member-diseases-input').name = `member_diseases_${index}`;
+            row.querySelector('.member-disabilities-input').name = `member_disabilities_${index}`;
+            row.querySelector('.member-mental-input').name = `member_mental_${index}`;
+            row.querySelector('.member-bp-sys').name = `member_bp_sys_${index}`;
+            row.querySelector('.member-bp-dia').name = `member_bp_dia_${index}`;
+            memberCount = index + 1;
+        });
+    }
+
+    addBtn.addEventListener('click', addMember);
+
+    // Add first member automatically
+    addMember();
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Submission Details | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/reports/{{ form_type }}/{% if form_type == 'core' %}0{% else %}{{ response.form.id }}{% endif %}/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Submissions</a>
+            <h1 class="h2 text-white fw-bold mb-0">Submission Details</h1>
+            <p class="text-secondary mb-0">Form Category: {{ form_name }}</p>
+        </div>
+    </div>
+
+    <!-- Core Health Survey Details -->
+    {% if form_type == 'core' %}
+        <div class="row g-4">
+            <div class="col-xl-4">
+                <div class="glass-card">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-house-user text-primary me-2"></i>Household Metadata</h4>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Family Head</span>
+                        <strong class="text-white fs-5">{{ survey.family_head_name }}</strong>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">House Number</span>
+                        <strong class="text-white fs-5">{{ survey.house_number }}</strong>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Location Jurisdiction</span>
+                        <span class="text-white">{{ survey.panchayat }} / {{ survey.ward }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Full Address</span>
+                        <span class="text-white"><small>{{ survey.address }}</small></span>
+                    </div>
+                    <hr class="border-secondary my-4">
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Conductor</span>
+                        <span class="text-white fw-semibold">{{ survey.submitted_by.username }} ({{ survey.submitted_role }})</span>
+                    </div>
+                    <div class="mb-0">
+                        <span class="text-secondary d-block">Date of Submission</span>
+                        <span class="text-white"><small>{{ survey.submitted_at|date:"Y-m-d H:i" }}</small></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-8">
+                <div class="glass-card">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-users text-primary me-2"></i>Household Members Diagnostic Data</h4>
+                    {% if members %}
+                        {% for m in members %}
+                            <div class="p-3 border rounded-3 mb-3" style="background: rgba(15, 23, 42, 0.4); border-color: var(--card-border) !important;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5 class="text-white mb-1">{{ m.name }}</h5>
+                                        <span class="text-secondary"><small>{{ m.age }} years | {{ m.get_gender_display }}</small></span>
+                                        {% if m.occupation %}
+                                            <div class="text-secondary mt-1"><small><i class="fa-solid fa-briefcase me-1"></i>{{ m.occupation }}</small></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <small class="text-secondary d-block">BP Status</small>
+                                                <span class="text-white">{% if m.blood_pressure_systolic %}{{ m.blood_pressure_systolic }}/{{ m.blood_pressure_diastolic }}{% else %}N/A{% endif %}</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-secondary d-block">Vaccination</small>
+                                                <span class="badge {% if m.vaccination_status == 'FULLY' %}bg-success{% elif m.vaccination_status == 'PARTIALLY' %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill">{{ m.get_vaccination_status_display }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            {% if m.is_pregnant %}<span class="badge bg-purple">Pregnant</span>{% endif %}
+                                            {% if m.has_diabetes %}<span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-35">Diabetes</span>{% endif %}
+                                            {% if m.has_cancer %}<span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-35">Cancer</span>{% endif %}
+                                        </div>
+                                        {% if m.diseases %}
+                                            <div class="text-secondary"><small><strong>Diseases:</strong> {{ m.diseases }}</small></div>
+                                        {% endif %}
+                                        {% if m.disabilities %}
+                                            <div class="text-secondary"><small><strong>Disabilities:</strong> {{ m.disabilities }}</small></div>
+                                        {% endif %}
+                                        {% if m.mental_health_indicators %}
+                                            <div class="text-secondary"><small><strong>Mental Health:</strong> {{ m.mental_health_indicators }}</small></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-secondary py-3 text-center mb-0">No family members registered.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    <!-- Dynamic Custom Survey Details -->
+    {% else %}
+        <div class="row g-4">
+            <div class="col-xl-4">
+                <div class="glass-card">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-file-invoice text-primary me-2"></i>Submission Meta</h4>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Conductor</span>
+                        <strong class="text-white fs-5">{{ response.submitted_by.username }}</strong>
+                        <div class="text-secondary"><small>Role: {{ response.submitted_role }}</small></div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="text-secondary d-block">Subcenter / Center Jurisdiction</span>
+                        <span class="text-white fw-semibold">{{ response.subcenter.name }}</span>
+                        <div class="text-secondary" style="font-size:0.8rem">Parent: {{ response.center.name }}</div>
+                    </div>
+                    <div class="mb-0">
+                        <span class="text-secondary d-block">Submission Time</span>
+                        <span class="text-white"><small>{{ response.submitted_at|date:"Y-m-d H:i" }}</small></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-8">
+                <div class="glass-card">
+                    <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-square-poll-horizontal text-primary me-2"></i>Survey Question Responses</h4>
+                    {% if answers %}
+                        <div class="table-responsive">
+                            <table class="table table-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%;">Field Question</th>
+                                        <th>Recorded Answer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ans in answers %}
+                                        <tr>
+                                            <td><span class="text-white fw-semibold">{{ ans.field.label }}</span></td>
+                                            <td>
+                                                {% if ans.field.field_type == 'FILE' and ans.value %}
+                                                    <a href="{{ ans.value }}" target="_blank" class="btn btn-sm btn-outline-info rounded-3">
+                                                        <i class="fa-solid fa-file-arrow-down me-1"></i>View Uploaded File
+                                                    </a>
+                                                {% else %}
+                                                    <span class="text-white">{{ ans.value|default:"(Empty)" }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-secondary py-3 text-center mb-0">No response answers logged.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-reports').classList.add('active');
+</script>
+{% endblock %}

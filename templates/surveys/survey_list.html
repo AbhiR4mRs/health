@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Surveys List | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white fw-bold mb-0">Health Surveys</h1>
+            <p class="text-secondary mb-0">List of all submitted primary household survey records</p>
+        </div>
+        {% if request.user.role == 'SUBCENTER' or request.user.role == 'CONDUCTOR' or request.user.is_superuser %}
+        <div>
+            <a href="/surveys/create/" class="btn btn-gradient">
+                <i class="fa-solid fa-plus me-2"></i>New Health Survey
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 rounded-3 mb-4 bg-opacity-25" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="glass-card">
+        {% if surveys %}
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>House Number</th>
+                            <th>Panchayat</th>
+                            <th>Ward</th>
+                            <th>Family Head</th>
+                            <th>Members Count</th>
+                            <th>Conductor</th>
+                            <th>Center / Subcenter</th>
+                            <th>Submitted At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for survey in surveys %}
+                            <tr>
+                                <td><span class="fw-semibold text-white">{{ survey.house_number }}</span></td>
+                                <td>{{ survey.panchayat }}</td>
+                                <td>{{ survey.ward }}</td>
+                                <td>{{ survey.family_head_name }}</td>
+                                <td><span class="badge bg-secondary rounded-pill">{{ survey.family_members_count }}</span></td>
+                                <td>{{ survey.submitted_by.username }} <small class="text-secondary">({{ survey.submitted_role }})</small></td>
+                                <td>
+                                    <div>{{ survey.center.name }}</div>
+                                    <small class="text-secondary">{{ survey.subcenter.name }}</small>
+                                </td>
+                                <td>{{ survey.submitted_at|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    <a href="/surveys/{{ survey.id }}/" class="btn btn-sm btn-outline-primary rounded-3">
+                                        <i class="fa-solid fa-eye me-1"></i>View details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-secondary">
+                <i class="fa-solid fa-circle-question mb-3" style="font-size: 3rem;"></i>
+                <p class="mb-0">No health surveys found in your dashboard partition.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-surveys').classList.add('active');
+</script>
+{% endblock %}

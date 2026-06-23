@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}HQ Dashboard | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white fw-bold mb-0">Headquarters Dashboard</h1>
+            <p class="text-secondary mb-0">State-wide statistics and public health indicators</p>
+        </div>
+        <div>
+            <a href="/reports/" class="btn btn-gradient">
+                <i class="fa-solid fa-file-export me-2"></i>Generate Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Total Centers</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ metrics.total_centers }}</h2>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-25 text-primary">
+                    <i class="fa-solid fa-hospital"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Total Subcenters</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ metrics.total_subcenters }}</h2>
+                </div>
+                <div class="stat-icon bg-purple bg-opacity-25 text-purple" style="color: var(--accent-purple) !important;">
+                    <i class="fa-solid fa-clinic-medical"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Total Surveys Conducted</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ metrics.total_surveys }}</h2>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-25 text-success" style="color: var(--accent-success) !important;">
+                    <i class="fa-solid fa-file-medical"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Population Covered</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ metrics.total_population }}</h2>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-25 text-warning" style="color: var(--accent-warning) !important;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+            <div class="glass-card">
+                <h4 class="card-title h5 text-white mb-4">Survey Completion Trends</h4>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="glass-card">
+                <h4 class="card-title h5 text-white mb-4">Diseases & High-Risk Case Breakdown</h4>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="diseaseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outbreaks & ML Alerts -->
+    <div class="glass-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title h5 text-white mb-0">Active Outbreak & Anomaly Detection Alerts</h4>
+            <span class="badge bg-danger rounded-3"><i class="fa-solid fa-bell me-1"></i>ML Powered</span>
+        </div>
+        {% if outbreaks %}
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>Panchayat</th>
+                            <th>Ward</th>
+                            <th>Time Period</th>
+                            <th>Reported Cases</th>
+                            <th>Z-Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in outbreaks %}
+                            <tr>
+                                <td><span class="fw-semibold text-white">{{ alert.panchayat }}</span></td>
+                                <td>{{ alert.ward }}</td>
+                                <td>{{ alert.week }}</td>
+                                <td><span class="badge bg-danger bg-opacity-10 text-danger px-2.5 py-1.5">{{ alert.cases }} Cases (Avg: {{ alert.average }})</span></td>
+                                <td>{{ alert.z_score }}</td>
+                                <td>
+                                    {% if alert.severity == 'Critical' %}
+                                        <span class="badge bg-danger text-white">Critical Alert</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Warning</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-secondary">
+                <i class="fa-solid fa-shield-halved mb-3" style="font-size: 2.5rem; color: var(--accent-success);"></i>
+                <p class="mb-0">No active disease outbreaks or anomalous clusters detected in any Panchayat/Ward.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-dash').classList.add('active');
+
+    // Trend Chart (Line)
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ metrics.trend_labels|safe }},
+            datasets: [{
+                label: 'Surveys Submitted',
+                data: {{ metrics.trend_values|safe }},
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Disease Chart (Pie)
+    const diseaseCtx = document.getElementById('diseaseChart').getContext('2d');
+    new Chart(diseaseCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ metrics.disease_labels|safe }},
+            datasets: [{
+                data: {{ metrics.disease_values|safe }},
+                backgroundColor: [
+                    '#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6'
+                ],
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#94a3b8', font: { family: 'Outfit' } }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

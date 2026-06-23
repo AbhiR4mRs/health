@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Error | Health Department Survey{% endblock %}
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="glass-card text-center p-5" style="max-width: 500px;">
+        <i class="fa-solid fa-triangle-exclamation text-danger mb-4" style="font-size: 4rem;"></i>
+        <h1 class="h3 text-white fw-bold mb-3">Access Denied / Error</h1>
+        <p class="text-secondary mb-4">{{ message }}</p>
+        <a href="/login/" class="btn btn-gradient">Return to Login</a>
+    </div>
+</div>
+{% endblock %}
