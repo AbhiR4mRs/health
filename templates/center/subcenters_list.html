@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Subcenters Management | Pazhayangadi Health Region{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white fw-bold mb-0">Subcenters Management</h1>
+            <p class="text-secondary mb-0">Jurisdiction: <span class="text-white fw-semibold">{{ center.name }}</span></p>
+        </div>
+    </div>
+
+    <div class="glass-card mb-4">
+        <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-list-check me-2 text-primary"></i>Your Managed Subcenters</h4>
+        {% if subcenters %}
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>Subcenter Name</th>
+                            <th>Code</th>
+                            <th>Staff Count</th>
+                            <th>Surveys Completed</th>
+                            <th>Address</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sc in subcenters %}
+                            <tr>
+                                <td><span class="fw-semibold text-white">{{ sc.name }}</span></td>
+                                <td><span class="badge bg-secondary">{{ sc.code }}</span></td>
+                                <td><span class="badge bg-purple">{{ sc.users.count }}</span></td>
+                                <td><span class="badge bg-success">{{ sc.health_surveys.count }}</span></td>
+                                <td><small>{{ sc.address|default:"N/A" }}</small></td>
+                                <td>
+                                    <a href="/management/subcenter/{{ sc.id }}/" class="btn btn-sm btn-outline-primary rounded-3">
+                                        <i class="fa-solid fa-folder-open me-1"></i>View details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-secondary py-4 text-center mb-0">No subcenters registered under your Center.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-mgmt').classList.add('active');
+</script>
+{% endblock %}

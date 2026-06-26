@@ -104,7 +104,7 @@
                                     <tbody>
                                         {% for c in centers %}
                                             <tr>
-                                                <td><span class="fw-semibold text-white">{{ c.name }}</span></td>
+                                                <td><a href="/management/center/{{ c.id }}/" class="text-primary text-decoration-none fw-semibold">{{ c.name }}</a></td>
                                                 <td><span class="badge bg-secondary">{{ c.code }}</span></td>
                                                 <td>{{ c.subcenters.count }}</td>
                                                 <td><small>{{ c.address|default:"N/A" }}</small></td>
@@ -134,7 +134,7 @@
                                     <tbody>
                                         {% for sc in subcenters %}
                                             <tr>
-                                                <td><span class="fw-semibold text-white">{{ sc.name }}</span></td>
+                                                <td><a href="/management/subcenter/{{ sc.id }}/" class="text-primary text-decoration-none fw-semibold">{{ sc.name }}</a></td>
                                                 <td><span class="badge bg-secondary">{{ sc.code }}</span></td>
                                                 <td>{{ sc.center.name }}</td>
                                                 <td><small>{{ sc.address|default:"N/A" }}</small></td>

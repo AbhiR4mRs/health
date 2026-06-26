@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Subcenter Detail: {{ subcenter.name }} | Pazhayangadi Health Region{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            {% if request.user.role == 'CENTER' %}
+                <a href="/center/subcenters/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Subcenters</a>
+            {% else %}
+                <a href="/management/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Management</a>
+            {% endif %}
+            <h1 class="h2 text-white fw-bold mb-0">{{ subcenter.name }}</h1>
+            <p class="text-secondary mb-0">Subcenter Code: <span class="badge bg-secondary">{{ subcenter.code }}</span> | Parent Center: <span class="text-white fw-semibold">{{ subcenter.center.name }}</span></p>
+        </div>
+    </div>
+
+    <!-- Subcenter Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Surveys Submitted</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ total_surveys }}</h2>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-25 text-success" style="color: var(--accent-success) !important;">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Registered Population</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ total_population }}</h2>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-25 text-warning" style="color: var(--accent-warning) !important;">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Conductors under this subcenter -->
+        <div class="col-xl-5">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-user-nurse me-2 text-primary"></i>Survey Conductors (Staff)</h4>
+                {% if conductors %}
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Surveys Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cond in conductors %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold text-white">{{ cond.username }}</span>
+                                            {% if cond.email %}<div style="font-size:0.72rem" class="text-secondary">{{ cond.email }}</div>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if cond.role == 'CONDUCTOR' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20">{{ cond.conductor_role }}</span>
+                                            {% else %}
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20">{{ cond.role }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><span class="badge bg-primary">{{ cond.survey_count }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary py-3 text-center mb-0">No survey conductors registered under this subcenter.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent activities under this subcenter -->
+        <div class="col-xl-7">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Recent Survey Submissions Log</h4>
+                {% if recent_surveys %}
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>House No.</th>
+                                    <th>Family Head</th>
+                                    <th>Conductor</th>
+                                    <th>Submitted At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in recent_surveys %}
+                                    <tr>
+                                        <td><span class="fw-semibold text-white">{{ s.house_number }}</span></td>
+                                        <td>{{ s.family_head_name }}</td>
+                                        <td>{{ s.submitted_by.username }} <small class="text-secondary">({{ s.submitted_role }})</small></td>
+                                        <td>{{ s.submitted_at|date:"Y-m-d H:i" }}</td>
+                                        <td>
+                                            <a href="/reports/core/submission/{{ s.id }}/" class="btn btn-sm btn-outline-primary rounded-3">
+                                                <i class="fa-solid fa-eye me-1"></i>View details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary py-3 text-center mb-0">No surveys submitted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-mgmt').classList.add('active');
+</script>
+{% endblock %}

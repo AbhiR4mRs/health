@@ -290,6 +290,13 @@
                     <span>HQ Management</span>
                 </a>
             </li>
+            {% elif request.user.role == 'CENTER' %}
+            <li class="nav-item">
+                <a id="nav-mgmt" href="/center/subcenters/" class="nav-link-custom">
+                    <i class="fa-solid fa-sitemap"></i>
+                    <span>Subcenters Management</span>
+                </a>
+            </li>
             {% endif %}
         </ul>
     </aside>

@@ -26,7 +26,8 @@ from apps.surveys.views import survey_list, survey_detail, survey_create
 from apps.forms_engine.views import forms_list, form_fill, form_create, form_edit, form_toggle, form_delete
 from apps.reports.views import reports_list_view, submissions_list_view, submission_detail_view
 from apps.ml_engine.views import ml_insights_view
-from apps.hq.views import hq_management_view
+from apps.hq.views import hq_management_view, center_detail_view, subcenter_detail_view
+from apps.center.views import center_subcenters_list_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,6 +42,11 @@ urlpatterns = [
     
     # HQ Management
     path('management/', hq_management_view, name='hq_management'),
+    path('management/center/<int:pk>/', center_detail_view, name='center_detail'),
+    path('management/subcenter/<int:pk>/', subcenter_detail_view, name='subcenter_detail'),
+    
+    # Center Admin Management
+    path('center/subcenters/', center_subcenters_list_view, name='center_subcenters_list'),
     
     # Core Health Surveys
     path('surveys/', survey_list, name='survey_list'),

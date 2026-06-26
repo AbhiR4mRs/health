@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Center Detail: {{ center.name }} | Pazhayangadi Health Region{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="/management/" class="btn btn-sm btn-outline-secondary rounded-3 mb-2"><i class="fa-solid fa-arrow-left me-1"></i>Back to Management</a>
+            <h1 class="h2 text-white fw-bold mb-0">{{ center.name }}</h1>
+            <p class="text-secondary mb-0">Center Code: <span class="badge bg-secondary">{{ center.code }}</span> | Registered: {{ center.created_at|date:"Y-m-d" }}</p>
+        </div>
+    </div>
+
+    <!-- Center Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Subcenters Active</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ subcenters.count }}</h2>
+                </div>
+                <div class="stat-icon bg-purple bg-opacity-25 text-purple" style="color: var(--accent-purple) !important;">
+                    <i class="fa-solid fa-clinic-medical"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Total Surveys Conducted</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ total_surveys }}</h2>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-25 text-success" style="color: var(--accent-success) !important;">
+                    <i class="fa-solid fa-file-medical"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary fw-semibold">Population Covered</span>
+                    <h2 class="mb-0 mt-1 fw-bold">{{ total_population }}</h2>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-25 text-warning" style="color: var(--accent-warning) !important;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Subcenters under this center -->
+        <div class="col-xl-6">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-clinic-medical me-2 text-primary"></i>Subcenters Jurisdiction</h4>
+                {% if subcenters %}
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Subcenter Name</th>
+                                    <th>Code</th>
+                                    <th>Surveys Completed</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sc in subcenters %}
+                                    <tr>
+                                        <td><span class="fw-semibold text-white">{{ sc.name }}</span></td>
+                                        <td><span class="badge bg-secondary">{{ sc.code }}</span></td>
+                                        <td><span class="badge bg-primary">{{ sc.survey_count }}</span></td>
+                                        <td>
+                                            <a href="/management/subcenter/{{ sc.id }}/" class="btn btn-sm btn-outline-primary rounded-3">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i>View details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary py-3 text-center mb-0">No subcenters registered under this center.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Users registry under this center -->
+        <div class="col-xl-6">
+            <div class="glass-card h-100">
+                <h4 class="card-title h5 text-white mb-4"><i class="fa-solid fa-users me-2 text-primary"></i>Associated Staff Directory</h4>
+                {% if users %}
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>System Role</th>
+                                    <th>Subcenter Association</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold text-white">{{ u.username }}</span>
+                                            {% if u.email %}<div style="font-size:0.75rem" class="text-secondary">{{ u.email }}</div>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if u.role == 'CONDUCTOR' %}
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20">{{ u.conductor_role }} Conductor</span>
+                                            {% else %}
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20">{{ u.role }} Admin</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ u.subcenter.name|default:"General (Center Level)" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary py-3 text-center mb-0">No staff members found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('nav-mgmt').classList.add('active');
+</script>
+{% endblock %}
