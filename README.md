@@ -1,6 +1,6 @@
-# Health Department Survey & Outbreak Surveillance Management System
+# Pazhayangadi Health Region Survey & Outbreak Surveillance Management System
 
-An enterprise-level, production-ready Health Department Survey Management System built using **Django 5**, **SQLite** (for development), **Bootstrap 5**, **Chart.js**, **Pandas**, **OpenPyXL**, **ReportLab**, and **Scikit-Learn**.
+An enterprise-level, production-ready Pazhayangadi Health Region Survey System built using **Django 5**, **SQLite** (for development), **Bootstrap 5**, **Chart.js**, **Pandas**, **OpenPyXL**, **ReportLab**, and **Scikit-Learn**.
 
 The system is designed for Conducting health surveys, collecting dynamic survey responses, managing system-wide reports, analyzing disease trends, detecting outbreaks, and monitoring public health indicators in compliance with role-based access control and row-level hierarchical scoping.
 
@@ -83,11 +83,11 @@ Visit [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
 | Username | Hierarchy Level | Role | Scope Visibility |
 | :--- | :--- | :--- | :--- |
 | `hq_admin` | HQ (Central) | Central Admin (Superuser) | State-wide dashboards, all reports, ML zone maps, outbreak alerts. |
-| `center_admin` | Center | Center Admin | Scoped to *Trivandrum Central CHC* and its child subcenters. |
-| `subcenter_admin` | Subcenter | Subcenter Admin | Scoped to *Vellanad Subcenter*. Can create/edit dynamic forms. |
-| `conductor_asha` | Conductor | ASHA (under Vellanad) | Fills dynamic surveys under Vellanad Subcenter. |
-| `conductor_jhi` | Conductor | JHI (under Vellanad) | Fills dynamic surveys under Vellanad Subcenter. |
-| `conductor_jphn` | Conductor | JPHN (under Aryanad) | Fills dynamic surveys under Aryanad Subcenter. |
+| `center_admin` | Center | Center Admin | Scoped to *Pazhayangadi CHC* and its child subcenters. |
+| `subcenter_admin` | Subcenter | Subcenter Admin | Scoped to *Pazhayangadi North Subcenter*. Can create/edit dynamic forms. |
+| `conductor_asha` | Conductor | ASHA (under Vellanad) | Fills dynamic surveys under Pazhayangadi North Subcenter. |
+| `conductor_jhi` | Conductor | JHI (under Vellanad) | Fills dynamic surveys under Pazhayangadi North Subcenter. |
+| `conductor_jphn` | Conductor | JPHN (under Aryanad) | Fills dynamic surveys under Pazhayangadi South Subcenter. |
 
 ---
 

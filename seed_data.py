@@ -26,13 +26,13 @@ def seed():
 
     print("Seeding HQ, Centers, and Subcenters...")
     # 1. Create Centers
-    c1 = Center.objects.create(name="Trivandrum Central CHC", code="CHC-TVM", address="Medical College, Trivandrum")
-    c2 = Center.objects.create(name="Ernakulam General Hospital CHC", code="CHC-EKM", address="MG Road, Ernakulam")
+    c1 = Center.objects.create(name="Pazhayangadi CHC", code="CHC-PZG", address="Medical College, Trivandrum")
+    c2 = Center.objects.create(name="Pazhayangadi East CHC", code="CHC-PZG-E", address="MG Road, Ernakulam")
 
     # 2. Create Subcenters
-    sc1 = Subcenter.objects.create(center=c1, name="Vellanad Subcenter", code="SC-VLD", address="Vellanad Junction")
-    sc2 = Subcenter.objects.create(center=c1, name="Aryanad Subcenter", code="SC-ARN", address="Aryanad Road")
-    sc3 = Subcenter.objects.create(center=c2, name="Kadavanthra Subcenter", code="SC-KDV", address="Kadavanthra East")
+    sc1 = Subcenter.objects.create(center=c1, name="Pazhayangadi North Subcenter", code="SC-PZG-N", address="Pazhayangadi Town")
+    sc2 = Subcenter.objects.create(center=c1, name="Pazhayangadi South Subcenter", code="SC-PZG-S", address="Pazhayangadi South")
+    sc3 = Subcenter.objects.create(center=c2, name="Pazhayangadi East Subcenter", code="SC-PZG-E", address="Pazhayangadi East")
 
     print("Seeding Users...")
     # 3. Create Users
@@ -104,7 +104,7 @@ def seed():
     print("Seeding Health Surveys & Family Members...")
     # 5. Create core health surveys and members
     wards = ["Ward 1", "Ward 2", "Ward 3", "Ward 4"]
-    panchayats = ["Vellanad Panchayat", "Aryanad Panchayat"]
+    panchayats = ["Pazhayangadi Panchayat", "Pazhayangadi East Panchayat"]
     occupations = ["Farmer", "Teacher", "Laborer", "Homemaker", "Shopkeeper", "Driver"]
     diseases_pool = ["Fever", "Tuberculosis", "Hypertension", "Dengue", "Asthma", "Cholera"]
 
